@@ -5,8 +5,6 @@
  * The admin service API description
  * OpenAPI spec version: 1.0
  */
-import * as axios from 'axios'
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
@@ -22,6 +20,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
+import { http } from '../../mutator/axios-instance'
 import type {
   AssignPermissionDto,
   CreateRoleDto,
@@ -34,13 +33,19 @@ import type {
  */
 export const rolesControllerCreate = (
   createRoleDto: CreateRoleDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDto>> => {
-  return axios.default.post(`/api/roles`, createRoleDto, options)
+  signal?: AbortSignal
+) => {
+  return http<RoleDto>({
+    url: `/api/roles`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createRoleDto,
+    signal,
+  })
 }
 
 export const getRolesControllerCreateMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -49,7 +54,6 @@ export const getRolesControllerCreateMutationOptions = <
     { data: CreateRoleDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof rolesControllerCreate>>,
   TError,
@@ -57,13 +61,13 @@ export const getRolesControllerCreateMutationOptions = <
   TContext
 > => {
   const mutationKey = ['rolesControllerCreate']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof rolesControllerCreate>>,
@@ -71,7 +75,7 @@ export const getRolesControllerCreateMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return rolesControllerCreate(data, axiosOptions)
+    return rolesControllerCreate(data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -81,15 +85,12 @@ export type RolesControllerCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerCreate>>
 >
 export type RolesControllerCreateMutationBody = CreateRoleDto
-export type RolesControllerCreateMutationError = AxiosError<unknown>
+export type RolesControllerCreateMutationError = unknown
 
 /**
  * @summary 创建角色
  */
-export const useRolesControllerCreate = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useRolesControllerCreate = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof rolesControllerCreate>>,
@@ -97,7 +98,6 @@ export const useRolesControllerCreate = <
       { data: CreateRoleDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -114,10 +114,8 @@ export const useRolesControllerCreate = <
 /**
  * @summary 获取角色列表
  */
-export const rolesControllerFindAll = (
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDetailDto[]>> => {
-  return axios.default.get(`/api/roles`, options)
+export const rolesControllerFindAll = (signal?: AbortSignal) => {
+  return http<RoleDetailDto[]>({ url: `/api/roles`, method: 'GET', signal })
 }
 
 export const getRolesControllerFindAllQueryKey = () => {
@@ -126,7 +124,7 @@ export const getRolesControllerFindAllQueryKey = () => {
 
 export const getRolesControllerFindAllQueryOptions = <
   TData = Awaited<ReturnType<typeof rolesControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -135,15 +133,14 @@ export const getRolesControllerFindAllQueryOptions = <
       TData
     >
   >
-  axios?: AxiosRequestConfig
 }) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey = queryOptions?.queryKey ?? getRolesControllerFindAllQueryKey()
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof rolesControllerFindAll>>
-  > = ({ signal }) => rolesControllerFindAll({ signal, ...axiosOptions })
+  > = ({ signal }) => rolesControllerFindAll(signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof rolesControllerFindAll>>,
@@ -155,11 +152,11 @@ export const getRolesControllerFindAllQueryOptions = <
 export type RolesControllerFindAllQueryResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerFindAll>>
 >
-export type RolesControllerFindAllQueryError = AxiosError<unknown>
+export type RolesControllerFindAllQueryError = unknown
 
 export function useRolesControllerFindAll<
   TData = Awaited<ReturnType<typeof rolesControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options: {
     query: Partial<
@@ -177,7 +174,6 @@ export function useRolesControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -185,7 +181,7 @@ export function useRolesControllerFindAll<
 }
 export function useRolesControllerFindAll<
   TData = Awaited<ReturnType<typeof rolesControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -203,7 +199,6 @@ export function useRolesControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -211,7 +206,7 @@ export function useRolesControllerFindAll<
 }
 export function useRolesControllerFindAll<
   TData = Awaited<ReturnType<typeof rolesControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -221,7 +216,6 @@ export function useRolesControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -233,7 +227,7 @@ export function useRolesControllerFindAll<
 
 export function useRolesControllerFindAll<
   TData = Awaited<ReturnType<typeof rolesControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -243,7 +237,6 @@ export function useRolesControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -262,11 +255,8 @@ export function useRolesControllerFindAll<
 /**
  * @summary 获取角色详情
  */
-export const rolesControllerFindOne = (
-  id: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDetailDto>> => {
-  return axios.default.get(`/api/roles/${id}`, options)
+export const rolesControllerFindOne = (id: string, signal?: AbortSignal) => {
+  return http<RoleDetailDto>({ url: `/api/roles/${id}`, method: 'GET', signal })
 }
 
 export const getRolesControllerFindOneQueryKey = (id: string) => {
@@ -275,7 +265,7 @@ export const getRolesControllerFindOneQueryKey = (id: string) => {
 
 export const getRolesControllerFindOneQueryOptions = <
   TData = Awaited<ReturnType<typeof rolesControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -286,17 +276,16 @@ export const getRolesControllerFindOneQueryOptions = <
         TData
       >
     >
-    axios?: AxiosRequestConfig
   }
 ) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getRolesControllerFindOneQueryKey(id)
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof rolesControllerFindOne>>
-  > = ({ signal }) => rolesControllerFindOne(id, { signal, ...axiosOptions })
+  > = ({ signal }) => rolesControllerFindOne(id, signal)
 
   return {
     queryKey,
@@ -313,11 +302,11 @@ export const getRolesControllerFindOneQueryOptions = <
 export type RolesControllerFindOneQueryResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerFindOne>>
 >
-export type RolesControllerFindOneQueryError = AxiosError<unknown>
+export type RolesControllerFindOneQueryError = unknown
 
 export function useRolesControllerFindOne<
   TData = Awaited<ReturnType<typeof rolesControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options: {
@@ -336,7 +325,6 @@ export function useRolesControllerFindOne<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -344,7 +332,7 @@ export function useRolesControllerFindOne<
 }
 export function useRolesControllerFindOne<
   TData = Awaited<ReturnType<typeof rolesControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -363,7 +351,6 @@ export function useRolesControllerFindOne<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -371,7 +358,7 @@ export function useRolesControllerFindOne<
 }
 export function useRolesControllerFindOne<
   TData = Awaited<ReturnType<typeof rolesControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -382,7 +369,6 @@ export function useRolesControllerFindOne<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -394,7 +380,7 @@ export function useRolesControllerFindOne<
 
 export function useRolesControllerFindOne<
   TData = Awaited<ReturnType<typeof rolesControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -405,7 +391,6 @@ export function useRolesControllerFindOne<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -424,15 +409,12 @@ export function useRolesControllerFindOne<
 /**
  * @summary 更新角色
  */
-export const rolesControllerUpdate = (
-  id: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDto>> => {
-  return axios.default.put(`/api/roles/${id}`, undefined, options)
+export const rolesControllerUpdate = (id: string, signal?: AbortSignal) => {
+  return http<RoleDto>({ url: `/api/roles/${id}`, method: 'PUT', signal })
 }
 
 export const getRolesControllerUpdateMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -441,7 +423,6 @@ export const getRolesControllerUpdateMutationOptions = <
     { id: string },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof rolesControllerUpdate>>,
   TError,
@@ -449,13 +430,13 @@ export const getRolesControllerUpdateMutationOptions = <
   TContext
 > => {
   const mutationKey = ['rolesControllerUpdate']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof rolesControllerUpdate>>,
@@ -463,7 +444,7 @@ export const getRolesControllerUpdateMutationOptions = <
   > = (props) => {
     const { id } = props ?? {}
 
-    return rolesControllerUpdate(id, axiosOptions)
+    return rolesControllerUpdate(id)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -473,15 +454,12 @@ export type RolesControllerUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerUpdate>>
 >
 
-export type RolesControllerUpdateMutationError = AxiosError<unknown>
+export type RolesControllerUpdateMutationError = unknown
 
 /**
  * @summary 更新角色
  */
-export const useRolesControllerUpdate = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useRolesControllerUpdate = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof rolesControllerUpdate>>,
@@ -489,7 +467,6 @@ export const useRolesControllerUpdate = <
       { id: string },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -506,15 +483,12 @@ export const useRolesControllerUpdate = <
 /**
  * @summary 删除角色
  */
-export const rolesControllerRemove = (
-  id: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDto>> => {
-  return axios.default.delete(`/api/roles/${id}`, options)
+export const rolesControllerRemove = (id: string, signal?: AbortSignal) => {
+  return http<RoleDto>({ url: `/api/roles/${id}`, method: 'DELETE', signal })
 }
 
 export const getRolesControllerRemoveMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -523,7 +497,6 @@ export const getRolesControllerRemoveMutationOptions = <
     { id: string },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof rolesControllerRemove>>,
   TError,
@@ -531,13 +504,13 @@ export const getRolesControllerRemoveMutationOptions = <
   TContext
 > => {
   const mutationKey = ['rolesControllerRemove']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof rolesControllerRemove>>,
@@ -545,7 +518,7 @@ export const getRolesControllerRemoveMutationOptions = <
   > = (props) => {
     const { id } = props ?? {}
 
-    return rolesControllerRemove(id, axiosOptions)
+    return rolesControllerRemove(id)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -555,15 +528,12 @@ export type RolesControllerRemoveMutationResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerRemove>>
 >
 
-export type RolesControllerRemoveMutationError = AxiosError<unknown>
+export type RolesControllerRemoveMutationError = unknown
 
 /**
  * @summary 删除角色
  */
-export const useRolesControllerRemove = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useRolesControllerRemove = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof rolesControllerRemove>>,
@@ -571,7 +541,6 @@ export const useRolesControllerRemove = <
       { id: string },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -591,17 +560,19 @@ export const useRolesControllerRemove = <
 export const rolesControllerAssignPermissions = (
   id: string,
   assignPermissionDto: AssignPermissionDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<RoleDetailDto>> => {
-  return axios.default.post(
-    `/api/roles/${id}/permissions`,
-    assignPermissionDto,
-    options
-  )
+  signal?: AbortSignal
+) => {
+  return http<RoleDetailDto>({
+    url: `/api/roles/${id}/permissions`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: assignPermissionDto,
+    signal,
+  })
 }
 
 export const getRolesControllerAssignPermissionsMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -610,7 +581,6 @@ export const getRolesControllerAssignPermissionsMutationOptions = <
     { id: string; data: AssignPermissionDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof rolesControllerAssignPermissions>>,
   TError,
@@ -618,13 +588,13 @@ export const getRolesControllerAssignPermissionsMutationOptions = <
   TContext
 > => {
   const mutationKey = ['rolesControllerAssignPermissions']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof rolesControllerAssignPermissions>>,
@@ -632,7 +602,7 @@ export const getRolesControllerAssignPermissionsMutationOptions = <
   > = (props) => {
     const { id, data } = props ?? {}
 
-    return rolesControllerAssignPermissions(id, data, axiosOptions)
+    return rolesControllerAssignPermissions(id, data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -642,13 +612,13 @@ export type RolesControllerAssignPermissionsMutationResult = NonNullable<
   Awaited<ReturnType<typeof rolesControllerAssignPermissions>>
 >
 export type RolesControllerAssignPermissionsMutationBody = AssignPermissionDto
-export type RolesControllerAssignPermissionsMutationError = AxiosError<unknown>
+export type RolesControllerAssignPermissionsMutationError = unknown
 
 /**
  * @summary 分配角色权限
  */
 export const useRolesControllerAssignPermissions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(
   options?: {
@@ -658,7 +628,6 @@ export const useRolesControllerAssignPermissions = <
       { id: string; data: AssignPermissionDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<

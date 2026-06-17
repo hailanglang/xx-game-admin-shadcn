@@ -5,8 +5,6 @@
  * The admin service API description
  * OpenAPI spec version: 1.0
  */
-import * as axios from 'axios'
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
@@ -19,15 +17,18 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
+import { http } from '../../mutator/axios-instance'
 import type { PermissionGroupDto, PermissionItemDto } from '../types'
 
 /**
  * @summary 获取所有权限列表（平铺）
  */
-export const permissionsControllerFindAll = (
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<PermissionItemDto[]>> => {
-  return axios.default.get(`/api/permissions`, options)
+export const permissionsControllerFindAll = (signal?: AbortSignal) => {
+  return http<PermissionItemDto[]>({
+    url: `/api/permissions`,
+    method: 'GET',
+    signal,
+  })
 }
 
 export const getPermissionsControllerFindAllQueryKey = () => {
@@ -36,7 +37,7 @@ export const getPermissionsControllerFindAllQueryKey = () => {
 
 export const getPermissionsControllerFindAllQueryOptions = <
   TData = Awaited<ReturnType<typeof permissionsControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -45,16 +46,15 @@ export const getPermissionsControllerFindAllQueryOptions = <
       TData
     >
   >
-  axios?: AxiosRequestConfig
 }) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getPermissionsControllerFindAllQueryKey()
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof permissionsControllerFindAll>>
-  > = ({ signal }) => permissionsControllerFindAll({ signal, ...axiosOptions })
+  > = ({ signal }) => permissionsControllerFindAll(signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof permissionsControllerFindAll>>,
@@ -66,11 +66,11 @@ export const getPermissionsControllerFindAllQueryOptions = <
 export type PermissionsControllerFindAllQueryResult = NonNullable<
   Awaited<ReturnType<typeof permissionsControllerFindAll>>
 >
-export type PermissionsControllerFindAllQueryError = AxiosError<unknown>
+export type PermissionsControllerFindAllQueryError = unknown
 
 export function usePermissionsControllerFindAll<
   TData = Awaited<ReturnType<typeof permissionsControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options: {
     query: Partial<
@@ -88,7 +88,6 @@ export function usePermissionsControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -96,7 +95,7 @@ export function usePermissionsControllerFindAll<
 }
 export function usePermissionsControllerFindAll<
   TData = Awaited<ReturnType<typeof permissionsControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -114,7 +113,6 @@ export function usePermissionsControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -122,7 +120,7 @@ export function usePermissionsControllerFindAll<
 }
 export function usePermissionsControllerFindAll<
   TData = Awaited<ReturnType<typeof permissionsControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -132,7 +130,6 @@ export function usePermissionsControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -144,7 +141,7 @@ export function usePermissionsControllerFindAll<
 
 export function usePermissionsControllerFindAll<
   TData = Awaited<ReturnType<typeof permissionsControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -154,7 +151,6 @@ export function usePermissionsControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -173,10 +169,12 @@ export function usePermissionsControllerFindAll<
 /**
  * @summary 获取按模块分组的权限列表
  */
-export const permissionsControllerFindGrouped = (
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<PermissionGroupDto[]>> => {
-  return axios.default.get(`/api/permissions/modules`, options)
+export const permissionsControllerFindGrouped = (signal?: AbortSignal) => {
+  return http<PermissionGroupDto[]>({
+    url: `/api/permissions/modules`,
+    method: 'GET',
+    signal,
+  })
 }
 
 export const getPermissionsControllerFindGroupedQueryKey = () => {
@@ -185,7 +183,7 @@ export const getPermissionsControllerFindGroupedQueryKey = () => {
 
 export const getPermissionsControllerFindGroupedQueryOptions = <
   TData = Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -194,17 +192,15 @@ export const getPermissionsControllerFindGroupedQueryOptions = <
       TData
     >
   >
-  axios?: AxiosRequestConfig
 }) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getPermissionsControllerFindGroupedQueryKey()
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof permissionsControllerFindGrouped>>
-  > = ({ signal }) =>
-    permissionsControllerFindGrouped({ signal, ...axiosOptions })
+  > = ({ signal }) => permissionsControllerFindGrouped(signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
@@ -216,11 +212,11 @@ export const getPermissionsControllerFindGroupedQueryOptions = <
 export type PermissionsControllerFindGroupedQueryResult = NonNullable<
   Awaited<ReturnType<typeof permissionsControllerFindGrouped>>
 >
-export type PermissionsControllerFindGroupedQueryError = AxiosError<unknown>
+export type PermissionsControllerFindGroupedQueryError = unknown
 
 export function usePermissionsControllerFindGrouped<
   TData = Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options: {
     query: Partial<
@@ -238,7 +234,6 @@ export function usePermissionsControllerFindGrouped<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -246,7 +241,7 @@ export function usePermissionsControllerFindGrouped<
 }
 export function usePermissionsControllerFindGrouped<
   TData = Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -264,7 +259,6 @@ export function usePermissionsControllerFindGrouped<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -272,7 +266,7 @@ export function usePermissionsControllerFindGrouped<
 }
 export function usePermissionsControllerFindGrouped<
   TData = Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -282,7 +276,6 @@ export function usePermissionsControllerFindGrouped<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -294,7 +287,7 @@ export function usePermissionsControllerFindGrouped<
 
 export function usePermissionsControllerFindGrouped<
   TData = Awaited<ReturnType<typeof permissionsControllerFindGrouped>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -304,7 +297,6 @@ export function usePermissionsControllerFindGrouped<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {

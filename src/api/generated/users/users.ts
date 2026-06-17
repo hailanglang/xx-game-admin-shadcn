@@ -5,8 +5,6 @@
  * The admin service API description
  * OpenAPI spec version: 1.0
  */
-import * as axios from 'axios'
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
@@ -22,6 +20,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
+import { http } from '../../mutator/axios-instance'
 import type {
   CreateUserDto,
   PaginatedUserDto,
@@ -36,13 +35,19 @@ import type {
  */
 export const usersControllerCreate = (
   createUserDto: CreateUserDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<UserDto>> => {
-  return axios.default.post(`/api/users`, createUserDto, options)
+  signal?: AbortSignal
+) => {
+  return http<UserDto>({
+    url: `/api/users`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createUserDto,
+    signal,
+  })
 }
 
 export const getUsersControllerCreateMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -51,7 +56,6 @@ export const getUsersControllerCreateMutationOptions = <
     { data: CreateUserDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof usersControllerCreate>>,
   TError,
@@ -59,13 +63,13 @@ export const getUsersControllerCreateMutationOptions = <
   TContext
 > => {
   const mutationKey = ['usersControllerCreate']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof usersControllerCreate>>,
@@ -73,7 +77,7 @@ export const getUsersControllerCreateMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return usersControllerCreate(data, axiosOptions)
+    return usersControllerCreate(data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -83,15 +87,12 @@ export type UsersControllerCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof usersControllerCreate>>
 >
 export type UsersControllerCreateMutationBody = CreateUserDto
-export type UsersControllerCreateMutationError = AxiosError<unknown>
+export type UsersControllerCreateMutationError = unknown
 
 /**
  * @summary 创建用户
  */
-export const useUsersControllerCreate = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useUsersControllerCreate = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof usersControllerCreate>>,
@@ -99,7 +100,6 @@ export const useUsersControllerCreate = <
       { data: CreateUserDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -118,11 +118,13 @@ export const useUsersControllerCreate = <
  */
 export const usersControllerFindAll = (
   params?: UsersControllerFindAllParams,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<PaginatedUserDto>> => {
-  return axios.default.get(`/api/users`, {
-    ...options,
-    params: { ...params, ...options?.params },
+  signal?: AbortSignal
+) => {
+  return http<PaginatedUserDto>({
+    url: `/api/users`,
+    method: 'GET',
+    params,
+    signal,
   })
 }
 
@@ -134,7 +136,7 @@ export const getUsersControllerFindAllQueryKey = (
 
 export const getUsersControllerFindAllQueryOptions = <
   TData = Awaited<ReturnType<typeof usersControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: UsersControllerFindAllParams,
   options?: {
@@ -145,18 +147,16 @@ export const getUsersControllerFindAllQueryOptions = <
         TData
       >
     >
-    axios?: AxiosRequestConfig
   }
 ) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getUsersControllerFindAllQueryKey(params)
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof usersControllerFindAll>>
-  > = ({ signal }) =>
-    usersControllerFindAll(params, { signal, ...axiosOptions })
+  > = ({ signal }) => usersControllerFindAll(params, signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof usersControllerFindAll>>,
@@ -168,11 +168,11 @@ export const getUsersControllerFindAllQueryOptions = <
 export type UsersControllerFindAllQueryResult = NonNullable<
   Awaited<ReturnType<typeof usersControllerFindAll>>
 >
-export type UsersControllerFindAllQueryError = AxiosError<unknown>
+export type UsersControllerFindAllQueryError = unknown
 
 export function useUsersControllerFindAll<
   TData = Awaited<ReturnType<typeof usersControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params: undefined | UsersControllerFindAllParams,
   options: {
@@ -191,7 +191,6 @@ export function useUsersControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -199,7 +198,7 @@ export function useUsersControllerFindAll<
 }
 export function useUsersControllerFindAll<
   TData = Awaited<ReturnType<typeof usersControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: UsersControllerFindAllParams,
   options?: {
@@ -218,7 +217,6 @@ export function useUsersControllerFindAll<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -226,7 +224,7 @@ export function useUsersControllerFindAll<
 }
 export function useUsersControllerFindAll<
   TData = Awaited<ReturnType<typeof usersControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: UsersControllerFindAllParams,
   options?: {
@@ -237,7 +235,6 @@ export function useUsersControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -249,7 +246,7 @@ export function useUsersControllerFindAll<
 
 export function useUsersControllerFindAll<
   TData = Awaited<ReturnType<typeof usersControllerFindAll>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: UsersControllerFindAllParams,
   options?: {
@@ -260,7 +257,6 @@ export function useUsersControllerFindAll<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -279,11 +275,8 @@ export function useUsersControllerFindAll<
 /**
  * @summary 获取用户详情
  */
-export const usersControllerFindOne = (
-  id: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<UserDetailDto>> => {
-  return axios.default.get(`/api/users/${id}`, options)
+export const usersControllerFindOne = (id: string, signal?: AbortSignal) => {
+  return http<UserDetailDto>({ url: `/api/users/${id}`, method: 'GET', signal })
 }
 
 export const getUsersControllerFindOneQueryKey = (id: string) => {
@@ -292,7 +285,7 @@ export const getUsersControllerFindOneQueryKey = (id: string) => {
 
 export const getUsersControllerFindOneQueryOptions = <
   TData = Awaited<ReturnType<typeof usersControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -303,17 +296,16 @@ export const getUsersControllerFindOneQueryOptions = <
         TData
       >
     >
-    axios?: AxiosRequestConfig
   }
 ) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getUsersControllerFindOneQueryKey(id)
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof usersControllerFindOne>>
-  > = ({ signal }) => usersControllerFindOne(id, { signal, ...axiosOptions })
+  > = ({ signal }) => usersControllerFindOne(id, signal)
 
   return {
     queryKey,
@@ -330,11 +322,11 @@ export const getUsersControllerFindOneQueryOptions = <
 export type UsersControllerFindOneQueryResult = NonNullable<
   Awaited<ReturnType<typeof usersControllerFindOne>>
 >
-export type UsersControllerFindOneQueryError = AxiosError<unknown>
+export type UsersControllerFindOneQueryError = unknown
 
 export function useUsersControllerFindOne<
   TData = Awaited<ReturnType<typeof usersControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options: {
@@ -353,7 +345,6 @@ export function useUsersControllerFindOne<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -361,7 +352,7 @@ export function useUsersControllerFindOne<
 }
 export function useUsersControllerFindOne<
   TData = Awaited<ReturnType<typeof usersControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -380,7 +371,6 @@ export function useUsersControllerFindOne<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -388,7 +378,7 @@ export function useUsersControllerFindOne<
 }
 export function useUsersControllerFindOne<
   TData = Awaited<ReturnType<typeof usersControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -399,7 +389,6 @@ export function useUsersControllerFindOne<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -411,7 +400,7 @@ export function useUsersControllerFindOne<
 
 export function useUsersControllerFindOne<
   TData = Awaited<ReturnType<typeof usersControllerFindOne>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   id: string,
   options?: {
@@ -422,7 +411,6 @@ export function useUsersControllerFindOne<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -444,13 +432,19 @@ export function useUsersControllerFindOne<
 export const usersControllerUpdate = (
   id: string,
   updateUserDto: UpdateUserDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<UserDto>> => {
-  return axios.default.put(`/api/users/${id}`, updateUserDto, options)
+  signal?: AbortSignal
+) => {
+  return http<UserDto>({
+    url: `/api/users/${id}`,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    data: updateUserDto,
+    signal,
+  })
 }
 
 export const getUsersControllerUpdateMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -459,7 +453,6 @@ export const getUsersControllerUpdateMutationOptions = <
     { id: string; data: UpdateUserDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof usersControllerUpdate>>,
   TError,
@@ -467,13 +460,13 @@ export const getUsersControllerUpdateMutationOptions = <
   TContext
 > => {
   const mutationKey = ['usersControllerUpdate']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof usersControllerUpdate>>,
@@ -481,7 +474,7 @@ export const getUsersControllerUpdateMutationOptions = <
   > = (props) => {
     const { id, data } = props ?? {}
 
-    return usersControllerUpdate(id, data, axiosOptions)
+    return usersControllerUpdate(id, data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -491,15 +484,12 @@ export type UsersControllerUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof usersControllerUpdate>>
 >
 export type UsersControllerUpdateMutationBody = UpdateUserDto
-export type UsersControllerUpdateMutationError = AxiosError<unknown>
+export type UsersControllerUpdateMutationError = unknown
 
 /**
  * @summary 更新用户
  */
-export const useUsersControllerUpdate = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useUsersControllerUpdate = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof usersControllerUpdate>>,
@@ -507,7 +497,6 @@ export const useUsersControllerUpdate = <
       { id: string; data: UpdateUserDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -524,15 +513,12 @@ export const useUsersControllerUpdate = <
 /**
  * @summary 删除用户
  */
-export const usersControllerRemove = (
-  id: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<UserDto>> => {
-  return axios.default.delete(`/api/users/${id}`, options)
+export const usersControllerRemove = (id: string, signal?: AbortSignal) => {
+  return http<UserDto>({ url: `/api/users/${id}`, method: 'DELETE', signal })
 }
 
 export const getUsersControllerRemoveMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -541,7 +527,6 @@ export const getUsersControllerRemoveMutationOptions = <
     { id: string },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof usersControllerRemove>>,
   TError,
@@ -549,13 +534,13 @@ export const getUsersControllerRemoveMutationOptions = <
   TContext
 > => {
   const mutationKey = ['usersControllerRemove']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof usersControllerRemove>>,
@@ -563,7 +548,7 @@ export const getUsersControllerRemoveMutationOptions = <
   > = (props) => {
     const { id } = props ?? {}
 
-    return usersControllerRemove(id, axiosOptions)
+    return usersControllerRemove(id)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -573,15 +558,12 @@ export type UsersControllerRemoveMutationResult = NonNullable<
   Awaited<ReturnType<typeof usersControllerRemove>>
 >
 
-export type UsersControllerRemoveMutationError = AxiosError<unknown>
+export type UsersControllerRemoveMutationError = unknown
 
 /**
  * @summary 删除用户
  */
-export const useUsersControllerRemove = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useUsersControllerRemove = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof usersControllerRemove>>,
@@ -589,7 +571,6 @@ export const useUsersControllerRemove = <
       { id: string },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<

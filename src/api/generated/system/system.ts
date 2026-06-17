@@ -5,8 +5,6 @@
  * The admin service API description
  * OpenAPI spec version: 1.0
  */
-import * as axios from 'axios'
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
@@ -22,6 +20,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
+import { http } from '../../mutator/axios-instance'
 import type {
   CreateSystemConfigDto,
   SystemControllerFindAllLogsParams,
@@ -33,17 +32,19 @@ import type {
  */
 export const systemControllerCreateConfig = (
   createSystemConfigDto: CreateSystemConfigDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.post(
-    `/api/system/configs`,
-    createSystemConfigDto,
-    options
-  )
+  signal?: AbortSignal
+) => {
+  return http<void>({
+    url: `/api/system/configs`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createSystemConfigDto,
+    signal,
+  })
 }
 
 export const getSystemControllerCreateConfigMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -52,7 +53,6 @@ export const getSystemControllerCreateConfigMutationOptions = <
     { data: CreateSystemConfigDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof systemControllerCreateConfig>>,
   TError,
@@ -60,13 +60,13 @@ export const getSystemControllerCreateConfigMutationOptions = <
   TContext
 > => {
   const mutationKey = ['systemControllerCreateConfig']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof systemControllerCreateConfig>>,
@@ -74,7 +74,7 @@ export const getSystemControllerCreateConfigMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return systemControllerCreateConfig(data, axiosOptions)
+    return systemControllerCreateConfig(data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -84,13 +84,13 @@ export type SystemControllerCreateConfigMutationResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerCreateConfig>>
 >
 export type SystemControllerCreateConfigMutationBody = CreateSystemConfigDto
-export type SystemControllerCreateConfigMutationError = AxiosError<unknown>
+export type SystemControllerCreateConfigMutationError = unknown
 
 /**
  * @summary 创建系统配置
  */
 export const useSystemControllerCreateConfig = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(
   options?: {
@@ -100,7 +100,6 @@ export const useSystemControllerCreateConfig = <
       { data: CreateSystemConfigDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -117,10 +116,8 @@ export const useSystemControllerCreateConfig = <
 /**
  * @summary 获取系统配置列表
  */
-export const systemControllerFindAllConfigs = (
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.get(`/api/system/configs`, options)
+export const systemControllerFindAllConfigs = (signal?: AbortSignal) => {
+  return http<void>({ url: `/api/system/configs`, method: 'GET', signal })
 }
 
 export const getSystemControllerFindAllConfigsQueryKey = () => {
@@ -129,7 +126,7 @@ export const getSystemControllerFindAllConfigsQueryKey = () => {
 
 export const getSystemControllerFindAllConfigsQueryOptions = <
   TData = Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -138,17 +135,15 @@ export const getSystemControllerFindAllConfigsQueryOptions = <
       TData
     >
   >
-  axios?: AxiosRequestConfig
 }) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getSystemControllerFindAllConfigsQueryKey()
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof systemControllerFindAllConfigs>>
-  > = ({ signal }) =>
-    systemControllerFindAllConfigs({ signal, ...axiosOptions })
+  > = ({ signal }) => systemControllerFindAllConfigs(signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
@@ -160,11 +155,11 @@ export const getSystemControllerFindAllConfigsQueryOptions = <
 export type SystemControllerFindAllConfigsQueryResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerFindAllConfigs>>
 >
-export type SystemControllerFindAllConfigsQueryError = AxiosError<unknown>
+export type SystemControllerFindAllConfigsQueryError = unknown
 
 export function useSystemControllerFindAllConfigs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options: {
     query: Partial<
@@ -182,7 +177,6 @@ export function useSystemControllerFindAllConfigs<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -190,7 +184,7 @@ export function useSystemControllerFindAllConfigs<
 }
 export function useSystemControllerFindAllConfigs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -208,7 +202,6 @@ export function useSystemControllerFindAllConfigs<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -216,7 +209,7 @@ export function useSystemControllerFindAllConfigs<
 }
 export function useSystemControllerFindAllConfigs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -226,7 +219,6 @@ export function useSystemControllerFindAllConfigs<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -238,7 +230,7 @@ export function useSystemControllerFindAllConfigs<
 
 export function useSystemControllerFindAllConfigs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllConfigs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -248,7 +240,6 @@ export function useSystemControllerFindAllConfigs<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -269,9 +260,13 @@ export function useSystemControllerFindAllConfigs<
  */
 export const systemControllerFindConfigByKey = (
   key: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.get(`/api/system/configs/${key}`, options)
+  signal?: AbortSignal
+) => {
+  return http<void>({
+    url: `/api/system/configs/${key}`,
+    method: 'GET',
+    signal,
+  })
 }
 
 export const getSystemControllerFindConfigByKeyQueryKey = (key: string) => {
@@ -280,7 +275,7 @@ export const getSystemControllerFindConfigByKeyQueryKey = (key: string) => {
 
 export const getSystemControllerFindConfigByKeyQueryOptions = <
   TData = Awaited<ReturnType<typeof systemControllerFindConfigByKey>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   key: string,
   options?: {
@@ -291,18 +286,16 @@ export const getSystemControllerFindConfigByKeyQueryOptions = <
         TData
       >
     >
-    axios?: AxiosRequestConfig
   }
 ) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getSystemControllerFindConfigByKeyQueryKey(key)
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof systemControllerFindConfigByKey>>
-  > = ({ signal }) =>
-    systemControllerFindConfigByKey(key, { signal, ...axiosOptions })
+  > = ({ signal }) => systemControllerFindConfigByKey(key, signal)
 
   return {
     queryKey,
@@ -319,11 +312,11 @@ export const getSystemControllerFindConfigByKeyQueryOptions = <
 export type SystemControllerFindConfigByKeyQueryResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerFindConfigByKey>>
 >
-export type SystemControllerFindConfigByKeyQueryError = AxiosError<unknown>
+export type SystemControllerFindConfigByKeyQueryError = unknown
 
 export function useSystemControllerFindConfigByKey<
   TData = Awaited<ReturnType<typeof systemControllerFindConfigByKey>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   key: string,
   options: {
@@ -342,7 +335,6 @@ export function useSystemControllerFindConfigByKey<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -350,7 +342,7 @@ export function useSystemControllerFindConfigByKey<
 }
 export function useSystemControllerFindConfigByKey<
   TData = Awaited<ReturnType<typeof systemControllerFindConfigByKey>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   key: string,
   options?: {
@@ -369,7 +361,6 @@ export function useSystemControllerFindConfigByKey<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -377,7 +368,7 @@ export function useSystemControllerFindConfigByKey<
 }
 export function useSystemControllerFindConfigByKey<
   TData = Awaited<ReturnType<typeof systemControllerFindConfigByKey>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   key: string,
   options?: {
@@ -388,7 +379,6 @@ export function useSystemControllerFindConfigByKey<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -400,7 +390,7 @@ export function useSystemControllerFindConfigByKey<
 
 export function useSystemControllerFindConfigByKey<
   TData = Awaited<ReturnType<typeof systemControllerFindConfigByKey>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   key: string,
   options?: {
@@ -411,7 +401,6 @@ export function useSystemControllerFindConfigByKey<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -436,17 +425,19 @@ export function useSystemControllerFindConfigByKey<
 export const systemControllerUpdateConfig = (
   key: string,
   updateSystemConfigDto: UpdateSystemConfigDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.put(
-    `/api/system/configs/${key}`,
-    updateSystemConfigDto,
-    options
-  )
+  signal?: AbortSignal
+) => {
+  return http<void>({
+    url: `/api/system/configs/${key}`,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    data: updateSystemConfigDto,
+    signal,
+  })
 }
 
 export const getSystemControllerUpdateConfigMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -455,7 +446,6 @@ export const getSystemControllerUpdateConfigMutationOptions = <
     { key: string; data: UpdateSystemConfigDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof systemControllerUpdateConfig>>,
   TError,
@@ -463,13 +453,13 @@ export const getSystemControllerUpdateConfigMutationOptions = <
   TContext
 > => {
   const mutationKey = ['systemControllerUpdateConfig']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof systemControllerUpdateConfig>>,
@@ -477,7 +467,7 @@ export const getSystemControllerUpdateConfigMutationOptions = <
   > = (props) => {
     const { key, data } = props ?? {}
 
-    return systemControllerUpdateConfig(key, data, axiosOptions)
+    return systemControllerUpdateConfig(key, data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -487,13 +477,13 @@ export type SystemControllerUpdateConfigMutationResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerUpdateConfig>>
 >
 export type SystemControllerUpdateConfigMutationBody = UpdateSystemConfigDto
-export type SystemControllerUpdateConfigMutationError = AxiosError<unknown>
+export type SystemControllerUpdateConfigMutationError = unknown
 
 /**
  * @summary 更新系统配置
  */
 export const useSystemControllerUpdateConfig = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(
   options?: {
@@ -503,7 +493,6 @@ export const useSystemControllerUpdateConfig = <
       { key: string; data: UpdateSystemConfigDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -522,13 +511,17 @@ export const useSystemControllerUpdateConfig = <
  */
 export const systemControllerDeleteConfig = (
   key: string,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.delete(`/api/system/configs/${key}`, options)
+  signal?: AbortSignal
+) => {
+  return http<void>({
+    url: `/api/system/configs/${key}`,
+    method: 'DELETE',
+    signal,
+  })
 }
 
 export const getSystemControllerDeleteConfigMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -537,7 +530,6 @@ export const getSystemControllerDeleteConfigMutationOptions = <
     { key: string },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof systemControllerDeleteConfig>>,
   TError,
@@ -545,13 +537,13 @@ export const getSystemControllerDeleteConfigMutationOptions = <
   TContext
 > => {
   const mutationKey = ['systemControllerDeleteConfig']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof systemControllerDeleteConfig>>,
@@ -559,7 +551,7 @@ export const getSystemControllerDeleteConfigMutationOptions = <
   > = (props) => {
     const { key } = props ?? {}
 
-    return systemControllerDeleteConfig(key, axiosOptions)
+    return systemControllerDeleteConfig(key)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -569,13 +561,13 @@ export type SystemControllerDeleteConfigMutationResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerDeleteConfig>>
 >
 
-export type SystemControllerDeleteConfigMutationError = AxiosError<unknown>
+export type SystemControllerDeleteConfigMutationError = unknown
 
 /**
  * @summary 删除系统配置
  */
 export const useSystemControllerDeleteConfig = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(
   options?: {
@@ -585,7 +577,6 @@ export const useSystemControllerDeleteConfig = <
       { key: string },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -604,12 +595,9 @@ export const useSystemControllerDeleteConfig = <
  */
 export const systemControllerFindAllLogs = (
   params?: SystemControllerFindAllLogsParams,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<void>> => {
-  return axios.default.get(`/api/system/logs`, {
-    ...options,
-    params: { ...params, ...options?.params },
-  })
+  signal?: AbortSignal
+) => {
+  return http<void>({ url: `/api/system/logs`, method: 'GET', params, signal })
 }
 
 export const getSystemControllerFindAllLogsQueryKey = (
@@ -620,7 +608,7 @@ export const getSystemControllerFindAllLogsQueryKey = (
 
 export const getSystemControllerFindAllLogsQueryOptions = <
   TData = Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: SystemControllerFindAllLogsParams,
   options?: {
@@ -631,18 +619,16 @@ export const getSystemControllerFindAllLogsQueryOptions = <
         TData
       >
     >
-    axios?: AxiosRequestConfig
   }
 ) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getSystemControllerFindAllLogsQueryKey(params)
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof systemControllerFindAllLogs>>
-  > = ({ signal }) =>
-    systemControllerFindAllLogs(params, { signal, ...axiosOptions })
+  > = ({ signal }) => systemControllerFindAllLogs(params, signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
@@ -654,11 +640,11 @@ export const getSystemControllerFindAllLogsQueryOptions = <
 export type SystemControllerFindAllLogsQueryResult = NonNullable<
   Awaited<ReturnType<typeof systemControllerFindAllLogs>>
 >
-export type SystemControllerFindAllLogsQueryError = AxiosError<unknown>
+export type SystemControllerFindAllLogsQueryError = unknown
 
 export function useSystemControllerFindAllLogs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params: undefined | SystemControllerFindAllLogsParams,
   options: {
@@ -677,7 +663,6 @@ export function useSystemControllerFindAllLogs<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -685,7 +670,7 @@ export function useSystemControllerFindAllLogs<
 }
 export function useSystemControllerFindAllLogs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: SystemControllerFindAllLogsParams,
   options?: {
@@ -704,7 +689,6 @@ export function useSystemControllerFindAllLogs<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -712,7 +696,7 @@ export function useSystemControllerFindAllLogs<
 }
 export function useSystemControllerFindAllLogs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: SystemControllerFindAllLogsParams,
   options?: {
@@ -723,7 +707,6 @@ export function useSystemControllerFindAllLogs<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -735,7 +718,7 @@ export function useSystemControllerFindAllLogs<
 
 export function useSystemControllerFindAllLogs<
   TData = Awaited<ReturnType<typeof systemControllerFindAllLogs>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   params?: SystemControllerFindAllLogsParams,
   options?: {
@@ -746,7 +729,6 @@ export function useSystemControllerFindAllLogs<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {

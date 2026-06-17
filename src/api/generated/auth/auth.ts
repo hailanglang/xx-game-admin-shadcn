@@ -5,8 +5,6 @@
  * The admin service API description
  * OpenAPI spec version: 1.0
  */
-import * as axios from 'axios'
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type {
   DataTag,
@@ -22,6 +20,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query'
+import { http } from '../../mutator/axios-instance'
 import type { LoginDto, LoginResponseDto, UserInfoDto } from '../types'
 
 /**
@@ -29,13 +28,19 @@ import type { LoginDto, LoginResponseDto, UserInfoDto } from '../types'
  */
 export const authControllerLogin = (
   loginDto: LoginDto,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<LoginResponseDto>> => {
-  return axios.default.post(`/api/auth/login`, loginDto, options)
+  signal?: AbortSignal
+) => {
+  return http<LoginResponseDto>({
+    url: `/api/auth/login`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: loginDto,
+    signal,
+  })
 }
 
 export const getAuthControllerLoginMutationOptions = <
-  TError = AxiosError<unknown>,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -44,7 +49,6 @@ export const getAuthControllerLoginMutationOptions = <
     { data: LoginDto },
     TContext
   >
-  axios?: AxiosRequestConfig
 }): UseMutationOptions<
   Awaited<ReturnType<typeof authControllerLogin>>,
   TError,
@@ -52,13 +56,13 @@ export const getAuthControllerLoginMutationOptions = <
   TContext
 > => {
   const mutationKey = ['authControllerLogin']
-  const { mutation: mutationOptions, axios: axiosOptions } = options
+  const { mutation: mutationOptions } = options
     ? options.mutation &&
       'mutationKey' in options.mutation &&
       options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, axios: undefined }
+    : { mutation: { mutationKey } }
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof authControllerLogin>>,
@@ -66,7 +70,7 @@ export const getAuthControllerLoginMutationOptions = <
   > = (props) => {
     const { data } = props ?? {}
 
-    return authControllerLogin(data, axiosOptions)
+    return authControllerLogin(data)
   }
 
   return { mutationFn, ...mutationOptions }
@@ -76,15 +80,12 @@ export type AuthControllerLoginMutationResult = NonNullable<
   Awaited<ReturnType<typeof authControllerLogin>>
 >
 export type AuthControllerLoginMutationBody = LoginDto
-export type AuthControllerLoginMutationError = AxiosError<unknown>
+export type AuthControllerLoginMutationError = unknown
 
 /**
  * @summary 用户登录
  */
-export const useAuthControllerLogin = <
-  TError = AxiosError<unknown>,
-  TContext = unknown,
->(
+export const useAuthControllerLogin = <TError = unknown, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof authControllerLogin>>,
@@ -92,7 +93,6 @@ export const useAuthControllerLogin = <
       { data: LoginDto },
       TContext
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseMutationResult<
@@ -109,10 +109,12 @@ export const useAuthControllerLogin = <
 /**
  * @summary 获取当前用户信息
  */
-export const authControllerGetCurrentUser = (
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<UserInfoDto>> => {
-  return axios.default.get(`/api/auth/currentUser`, options)
+export const authControllerGetCurrentUser = (signal?: AbortSignal) => {
+  return http<UserInfoDto>({
+    url: `/api/auth/currentUser`,
+    method: 'GET',
+    signal,
+  })
 }
 
 export const getAuthControllerGetCurrentUserQueryKey = () => {
@@ -121,7 +123,7 @@ export const getAuthControllerGetCurrentUserQueryKey = () => {
 
 export const getAuthControllerGetCurrentUserQueryOptions = <
   TData = Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -130,16 +132,15 @@ export const getAuthControllerGetCurrentUserQueryOptions = <
       TData
     >
   >
-  axios?: AxiosRequestConfig
 }) => {
-  const { query: queryOptions, axios: axiosOptions } = options ?? {}
+  const { query: queryOptions } = options ?? {}
 
   const queryKey =
     queryOptions?.queryKey ?? getAuthControllerGetCurrentUserQueryKey()
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof authControllerGetCurrentUser>>
-  > = ({ signal }) => authControllerGetCurrentUser({ signal, ...axiosOptions })
+  > = ({ signal }) => authControllerGetCurrentUser(signal)
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
@@ -151,11 +152,11 @@ export const getAuthControllerGetCurrentUserQueryOptions = <
 export type AuthControllerGetCurrentUserQueryResult = NonNullable<
   Awaited<ReturnType<typeof authControllerGetCurrentUser>>
 >
-export type AuthControllerGetCurrentUserQueryError = AxiosError<unknown>
+export type AuthControllerGetCurrentUserQueryError = unknown
 
 export function useAuthControllerGetCurrentUser<
   TData = Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options: {
     query: Partial<
@@ -173,7 +174,6 @@ export function useAuthControllerGetCurrentUser<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -181,7 +181,7 @@ export function useAuthControllerGetCurrentUser<
 }
 export function useAuthControllerGetCurrentUser<
   TData = Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -199,7 +199,6 @@ export function useAuthControllerGetCurrentUser<
         >,
         'initialData'
       >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -207,7 +206,7 @@ export function useAuthControllerGetCurrentUser<
 }
 export function useAuthControllerGetCurrentUser<
   TData = Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -217,7 +216,6 @@ export function useAuthControllerGetCurrentUser<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -229,7 +227,7 @@ export function useAuthControllerGetCurrentUser<
 
 export function useAuthControllerGetCurrentUser<
   TData = Awaited<ReturnType<typeof authControllerGetCurrentUser>>,
-  TError = AxiosError<unknown>,
+  TError = unknown,
 >(
   options?: {
     query?: Partial<
@@ -239,7 +237,6 @@ export function useAuthControllerGetCurrentUser<
         TData
       >
     >
-    axios?: AxiosRequestConfig
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
