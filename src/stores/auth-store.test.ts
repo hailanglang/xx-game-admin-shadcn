@@ -1,4 +1,3 @@
-import { clearCookies } from '@/test-utils/cookies'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 async function importAuthStore() {
@@ -7,15 +6,18 @@ async function importAuthStore() {
 }
 
 const sampleUser = {
-  accountNo: 'ACC-1',
+  id: 1,
+  username: 'admin',
   email: 'user@example.com',
-  role: ['user'],
-  exp: 1_700_000_000,
+  avatar: '',
+  roleId: 1,
+  roleName: '管理员',
+  permissions: ['user:read'],
 }
 
 describe('useAuthStore', () => {
   beforeEach(() => {
-    clearCookies()
+    localStorage.clear()
     vi.resetModules()
   })
 

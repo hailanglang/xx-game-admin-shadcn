@@ -7,7 +7,7 @@ export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
 
 const instance = axios.create({
   baseURL: apiBaseUrl,
-  timeout: 30000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,16 +25,32 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
-/** 响应拦截器：统一错误处理 */
+/** 响应拦截器：解包 + 统一错误处理 */
 instance.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse<{ success: boolean; data: unknown; message?: string }>) => {
+    const body = response.data
+
+    // 后端统一包装了 { success, data, message }
+    if (body && typeof body === 'object' && 'success' in body) {
+      if (!body.success) {
+        // 业务错误（HTTP 200 但 success=false）
+        const errMsg = body.message || '请求失败'
+        toast.error(errMsg)
+        return Promise.reject(new Error(errMsg))
+      }
+      // 解包：将 body.data 提升为 response.data
+      response.data = body.data as typeof response.data
+    }
+
+    return response
+  },
   (error: AxiosError<{ message?: string; title?: string }>) => {
     if (!error.response) {
       toast.error('网络连接异常，请检查网络后重试')
       return Promise.reject(error)
     }
 
-    const { status } = error.response
+    const { status, data } = error.response
 
     switch (status) {
       case 401:
@@ -48,7 +64,10 @@ instance.interceptors.response.use(
         toast.error('请求的资源不存在')
         break
       case 422:
-        // 表单校验错误，由组件自行处理
+        // 表单校验错误，由后端返回错误信息
+        if (data && typeof data === 'object' && 'message' in data) {
+          toast.error(data.message as string)
+        }
         break
       case 500:
         toast.error('服务器内部错误')
