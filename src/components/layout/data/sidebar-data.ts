@@ -49,57 +49,57 @@ export const sidebarData: SidebarData = {
   ],
   navGroups: [
     {
-      title: 'General',
+      title: '通用',
       items: [
         {
-          title: 'Dashboard',
+          title: '仪表盘',
           url: '/',
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
+          title: '任务',
           url: '/tasks',
           icon: ListTodo,
         },
         {
-          title: 'Apps',
+          title: '应用',
           url: '/apps',
           icon: Package,
         },
         {
-          title: 'Chats',
+          title: '聊天',
           url: '/chats',
           badge: '3',
           icon: MessagesSquare,
         },
         {
-          title: 'Users',
+          title: '用户',
           url: '/users',
           icon: Users,
         },
       ],
     },
     {
-      title: 'Pages',
+      title: '页面',
       items: [
         {
-          title: 'Auth',
+          title: '认证',
           icon: ShieldCheck,
           items: [
             {
-              title: 'Sign In',
+              title: '登录',
               url: '/sign-in',
             },
             {
-              title: 'Sign In (2 Col)',
+              title: '登录（双列）',
               url: '/sign-in-2',
             },
             {
-              title: 'Sign Up',
+              title: '注册',
               url: '/sign-up',
             },
             {
-              title: 'Forgot Password',
+              title: '忘记密码',
               url: '/forgot-password',
             },
             {
@@ -109,31 +109,31 @@ export const sidebarData: SidebarData = {
           ],
         },
         {
-          title: 'Errors',
+          title: '错误',
           icon: Bug,
           items: [
             {
-              title: 'Unauthorized',
+              title: '未授权',
               url: '/errors/unauthorized',
               icon: Lock,
             },
             {
-              title: 'Forbidden',
+              title: '禁止访问',
               url: '/errors/forbidden',
               icon: UserX,
             },
             {
-              title: 'Not Found',
+              title: '未找到',
               url: '/errors/not-found',
               icon: FileX,
             },
             {
-              title: 'Internal Server Error',
+              title: '服务器内部错误',
               url: '/errors/internal-server-error',
               icon: ServerOff,
             },
             {
-              title: 'Maintenance Error',
+              title: '维护中',
               url: '/errors/maintenance-error',
               icon: Construction,
             },
@@ -142,41 +142,41 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Other',
+      title: '其他',
       items: [
         {
-          title: 'Settings',
+          title: '设置',
           icon: Settings,
           items: [
             {
-              title: 'Profile',
+              title: '个人资料',
               url: '/settings',
               icon: UserCog,
             },
             {
-              title: 'Account',
+              title: '账号',
               url: '/settings/account',
               icon: Wrench,
             },
             {
-              title: 'Appearance',
+              title: '外观',
               url: '/settings/appearance',
               icon: Palette,
             },
             {
-              title: 'Notifications',
+              title: '通知',
               url: '/settings/notifications',
               icon: Bell,
             },
             {
-              title: 'Display',
+              title: '显示',
               url: '/settings/display',
               icon: Monitor,
             },
           ],
         },
         {
-          title: 'Help Center',
+          title: '帮助中心',
           url: '/help-center',
           icon: HelpCircle,
         },
