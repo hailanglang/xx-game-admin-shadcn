@@ -24,8 +24,8 @@ describe('ForgotPasswordForm', () => {
     vi.clearAllMocks()
 
     screen = await render(<ForgotPasswordForm />)
-    emailInput = screen.getByRole('textbox', { name: /^Email$/i })
-    continueButton = screen.getByRole('button', { name: /^Continue$/i })
+    emailInput = screen.getByRole('textbox', { name: /^邮箱$/i })
+    continueButton = screen.getByRole('button', { name: /^发送重置链接$/i })
   })
 
   it('renders email field and continue button', async () => {
@@ -36,16 +36,16 @@ describe('ForgotPasswordForm', () => {
   it('shows validation when submitting empty form', async () => {
     await userEvent.click(continueButton)
     await expect
-      .element(screen.getByText(/^Please enter your email\.$/i))
+      .element(screen.getByText(/^请输入邮箱地址。$/i))
       .toBeInTheDocument()
   })
 
-  it('resets the form and navigates to /otp on success', async () => {
+  it('resets the form and navigates to /sign-in on success', async () => {
     await userEvent.fill(emailInput, 'a@b.com')
     await userEvent.click(continueButton)
 
     await vi.waitFor(() =>
-      expect(navigateMock).toHaveBeenCalledWith({ to: '/otp' })
+      expect(navigateMock).toHaveBeenCalledWith({ to: '/sign-in' })
     )
 
     // Form should reset on success
