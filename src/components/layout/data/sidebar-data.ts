@@ -1,19 +1,13 @@
 import {
   Construction,
   LayoutDashboard,
-  Monitor,
   Bug,
   ListTodo,
   FileX,
   HelpCircle,
   Lock,
-  Bell,
   Package,
-  Palette,
   ServerOff,
-  Settings,
-  Wrench,
-  UserCog,
   UserX,
   Users,
   MessagesSquare,
@@ -144,37 +138,6 @@ export const sidebarData: SidebarData = {
     {
       title: '其他',
       items: [
-        {
-          title: '设置',
-          icon: Settings,
-          items: [
-            {
-              title: '个人资料',
-              url: '/settings',
-              icon: UserCog,
-            },
-            {
-              title: '账号',
-              url: '/settings/account',
-              icon: Wrench,
-            },
-            {
-              title: '外观',
-              url: '/settings/appearance',
-              icon: Palette,
-            },
-            {
-              title: '通知',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: '显示',
-              url: '/settings/display',
-              icon: Monitor,
-            },
-          ],
-        },
         {
           title: '帮助中心',
           url: '/help-center',

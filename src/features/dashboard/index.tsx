@@ -209,10 +209,4 @@ const topNav = [
     isActive: false,
     disabled: true,
   },
-  {
-    title: 'Settings',
-    href: 'dashboard/settings',
-    isActive: false,
-    disabled: true,
-  },
 ]
