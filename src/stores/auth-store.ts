@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { UserInfoDto } from '@/api/generated/types'
+import type { UserInfoDto } from '@/api'
 
 type AuthUser = UserInfoDto
 
