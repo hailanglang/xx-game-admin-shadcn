@@ -31,6 +31,7 @@ export {
   useRolesControllerCreate,
   useRolesControllerUpdate,
   useRolesControllerRemove,
+  useRolesControllerAssignPermissions,
 } from '@/api/generated/roles/roles'
 
 // ── 权限管理 ──
@@ -61,4 +62,5 @@ export type {
   PermissionGroupDto,
   PermissionItemDto,
   RolePermissionDto,
+  AssignPermissionDto,
 } from '@/api/generated/types'
