@@ -32,6 +32,7 @@ export {
   useRolesControllerUpdate,
   useRolesControllerRemove,
   useRolesControllerAssignPermissions,
+  getRolesControllerFindAllQueryKey,
 } from '@/api/generated/roles/roles'
 
 // ── 权限管理 ──

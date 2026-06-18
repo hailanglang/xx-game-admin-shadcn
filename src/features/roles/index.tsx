@@ -11,7 +11,8 @@ import { RolesProvider } from './components/roles-provider'
 import { RolesTable } from './components/roles-table'
 
 export function Roles() {
-  const { data: roles = [] } = useRolesControllerFindAll()
+  const { data: response } = useRolesControllerFindAll()
+  const roles = response?.data ?? []
 
   return (
     <RolesProvider>

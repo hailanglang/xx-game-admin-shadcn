@@ -37,16 +37,19 @@ export function RolesPermissionDialog({
   const queryClient = useQueryClient()
 
   // 获取按模块分组的权限
-  const { data: groupedPermissions, isLoading: isPermissionsLoading } =
+  const { data: permissionsResponse, isLoading: isPermissionsLoading } =
     usePermissionsControllerFindGrouped({
       query: { enabled: open },
     })
 
   // 获取角色当前权限
-  const { data: roleDetail, isLoading: isRoleLoading } =
+  const { data: roleResponse, isLoading: isRoleLoading } =
     useRolesControllerFindOne(String(currentRow.id), {
       query: { enabled: open },
     })
+
+  const groupedPermissions = permissionsResponse?.data
+  const roleDetail = roleResponse?.data
 
   const { mutateAsync: assignPermissions, isPending: isSaving } =
     useRolesControllerAssignPermissions()
