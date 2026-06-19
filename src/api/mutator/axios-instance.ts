@@ -55,7 +55,10 @@ instance.interceptors.response.use(
     }
 
     const { status, data } = error.response
-
+    if (data && typeof data === 'object' && 'message' in data) {
+        toast.error(data.message as string)
+        return Promise.reject(error)
+    }
     switch (status) {
       case 401:
         toast.error('登录已过期，请重新登录')

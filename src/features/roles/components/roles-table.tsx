@@ -83,7 +83,7 @@ export function RolesTable({ data }: DataTableProps) {
                     key={header.id}
                     colSpan={header.colSpan}
                     className={cn(
-                      'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                      'bg-background text-center group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
                       header.column.columnDef.meta?.className,
                       header.column.columnDef.meta?.thClassName
                     )}
@@ -111,7 +111,7 @@ export function RolesTable({ data }: DataTableProps) {
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                        'bg-background text-center group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
                         cell.column.columnDef.meta?.className,
                         cell.column.columnDef.meta?.tdClassName
                       )}

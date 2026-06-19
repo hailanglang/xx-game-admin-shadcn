@@ -48,7 +48,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
                   }}
                   className={isSystem ? 'opacity-50' : ''}
                 >
-                  Edit
+                  编辑
                   <DropdownMenuShortcut>
                     <UserPen size={16} />
                   </DropdownMenuShortcut>
@@ -63,17 +63,34 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Tooltip>
         </TooltipProvider>
 
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(row.original)
-            setOpen('permission')
-          }}
-        >
-          权限编辑
-          <DropdownMenuShortcut>
-            <Shield size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild className={isSystem ? 'cursor-not-allowed' : ''}>
+              <div>
+                <DropdownMenuItem
+                  disabled={isSystem}
+                  onClick={() => {
+                    if (!isSystem) {
+                      setCurrentRow(row.original)
+                      setOpen('permission')
+                    }
+                  }}
+                  className={isSystem ? 'opacity-50' : ''}
+                >
+                  权限编辑
+                  <DropdownMenuShortcut>
+                    <Shield size={16} />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </div>
+            </TooltipTrigger>
+            {isSystem && (
+              <TooltipContent side='left'>
+                <p>系统角色不可修改权限</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
 
         <DropdownMenuSeparator />
 
@@ -91,7 +108,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
                   }}
                   className={isSystem ? 'opacity-50 text-red-500!' : 'text-red-500!'}
                 >
-                  Delete
+                  删除
                   <DropdownMenuShortcut>
                     <Trash2 size={16} />
                   </DropdownMenuShortcut>
