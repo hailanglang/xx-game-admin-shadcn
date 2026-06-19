@@ -1,9 +1,6 @@
 import {
   LayoutDashboard,
-  ListTodo,
-  Package,
   Users,
-  MessagesSquare,
   Shield,
   AudioWaveform,
   Command,
@@ -42,22 +39,6 @@ export const sidebarData: SidebarData = {
           title: '仪表盘',
           url: '/',
           icon: LayoutDashboard,
-        },
-        {
-          title: '任务',
-          url: '/tasks',
-          icon: ListTodo,
-        },
-        {
-          title: '应用',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: '聊天',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
         },
         {
           title: '用户',
