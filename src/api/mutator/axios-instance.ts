@@ -45,6 +45,10 @@ instance.interceptors.response.use(
     return response
   },
   (error: AxiosError<{ message?: string; title?: string }>) => {
+    if (error.code === AxiosError.ERR_CANCELED) {
+      return Promise.reject(error)
+    }
+
     if (!error.response) {
       toast.error('网络连接异常，请检查网络后重试')
       return Promise.reject(error)
