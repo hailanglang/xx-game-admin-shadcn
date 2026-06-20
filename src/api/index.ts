@@ -22,6 +22,7 @@ export {
   useUsersControllerCreate,
   useUsersControllerUpdate,
   useUsersControllerRemove,
+  getUsersControllerFindAllQueryKey,
 } from '@/api/generated/users/users'
 
 // ── 角色管理 ──
