@@ -36,6 +36,15 @@ export {
   getRolesControllerFindAllQueryKey,
 } from '@/api/generated/roles/roles'
 
+// ── 文章管理 ──
+export {
+  usePostsControllerFindAll,
+  usePostsControllerFindOne,
+  usePostsControllerUpdate,
+  usePostsControllerRemove,
+  getPostsControllerFindAllQueryKey,
+} from '@/api/generated/posts/posts'
+
 // ── 权限管理 ──
 export {
   usePermissionsControllerFindAll,
@@ -65,4 +74,7 @@ export type {
   PermissionItemDto,
   RolePermissionDto,
   AssignPermissionDto,
+  PostDetailDto,
+  UpdatePostDto,
+  PostImageDto,
 } from '@/api/generated/types'
